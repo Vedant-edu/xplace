@@ -18,10 +18,7 @@ export const Navbar: React.FC<NavbarProps> = ({
       
       <div className="max-w-7xl mx-auto px-4 py-2 flex items-center justify-between">
         <div className="flex items-center space-x-4">
-          <svg width="24" height="36" viewBox="0 0 100 100">
-            <rect x="5" y="10" width="90" height="80" fill="none" stroke="white" strokeWidth="10" />
-          </svg>
-          <h1 className="text-xl font-bold text-gray-900 dark:text-white">
+          <h1 className="text-xl font-bold text-gray-900 dark:text-white border border-white px-2">
             {isAdmin ? 'Xplace Admin' : 'Xplace'}
           </h1>
         </div>

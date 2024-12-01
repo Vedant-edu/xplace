@@ -1,4 +1,5 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
+import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
 import { Toaster } from 'react-hot-toast';
 import { supabase } from './config/supabase';
 import { PlacementData } from './types';
@@ -21,21 +22,17 @@ function App() {
   const [sortBy, setSortBy] = useState<SortOption>('recent');
   const [data, setData] = useState<PlacementData[]>([]);
   const [showDisclaimer, setShowDisclaimer] = useState(false); // State to manage the disclaimer popup
+  const [currentPage, setCurrentPage] = useState(1);
+  const cardsPerPage = 7;
 
   useEffect(() => {
     fetchData();
-    const path = window.location.pathname;
-    if (path === '/admin') {
-      setIsAdmin(true);
-    }
   }, []);
 
   useEffect(() => {
     document.documentElement.classList.toggle('dark', isDark);
     document.body.style.backgroundColor = isDark ? '#111827' : '#f3f4f6';
   }, [isDark]);
-
-  const [isAdmin, setIsAdmin] = useState(false);
 
   const fetchData = async () => {
     try {
@@ -80,57 +77,72 @@ function App() {
     return acc + curr.total_students;
   }, 0);
 
-  if (isAdmin) {
-    return (
-      <div className="min-h-screen bg-gray-100 dark:bg-gray-900 text-gray-900 dark:text-white">
-        <Navbar isDark={isDark} onThemeToggle={() => setIsDark(!isDark)} />
-        <AdminPanel onDataAdded={fetchData} />
-        <Toaster position="bottom-right" />
-      </div>
-    );
-  }
+  const indexOfLastCard = currentPage * cardsPerPage;
+  const indexOfFirstCard = indexOfLastCard - cardsPerPage;
+  const currentCards = filteredData.slice(indexOfFirstCard, indexOfLastCard);
+
+  const paginate = (pageNumber: number) => setCurrentPage(pageNumber);
 
   return (
-    <div className="min-h-screen bg-gray-100 dark:bg-gray-900 text-gray-900 dark:text-white">
-      <Navbar isDark={isDark} onThemeToggle={() => setIsDark(!isDark)} />
+    <Router>
+      <div className="min-h-screen bg-gray-100 dark:bg-gray-900 text-gray-900 dark:text-white">
+        <Navbar isDark={isDark} onThemeToggle={() => setIsDark(!isDark)} />
+        <Routes>
+          <Route path="/admin" element={<AdminPanel onDataAdded={fetchData} />} />
+          <Route path="/" element={
+            <div>
+              <main className="max-w-7xl mx-auto px-4 py-8">
+                <div className="flex flex-col space-y-4">
+                  <div className="flex items-center justify-between">
+                    <TabFilter activeTab={activeTab} onTabChange={setActiveTab} />
+                    <SearchSort
+                      searchTerm={searchTerm}
+                      onSearchChange={setSearchTerm}
+                      sortBy={sortBy}
+                      onSortChange={setSortBy}
+                    />
+                  </div>
+                </div>
 
-      <main className="max-w-7xl mx-auto px-4 py-8">
-        <div className="flex flex-col space-y-4">
-          <div className="flex items-center justify-between">
-            <TabFilter activeTab={activeTab} onTabChange={setActiveTab} />
-            <SearchSort
-              searchTerm={searchTerm}
-              onSearchChange={setSearchTerm}
-              sortBy={sortBy}
-              onSortChange={setSortBy}
-            />
-          </div>
-        </div>
+                <StatisticsPanel
+                  data={data}
+                  activeTab={activeTab}
+                  totalOffers={totalOffers}
+                />
 
-        <StatisticsPanel
-          data={data}
-          activeTab={activeTab}
-          totalOffers={totalOffers}
-        />
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                  {currentCards.map((item) => (
+                    <PlacementCard key={item.id} data={item} section={activeTab} />
+                  ))}
+                </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {filteredData.map((item) => (
-            <PlacementCard key={item.id} data={item} section={activeTab} />
-          ))}
-        </div>
-      </main>
+                <div className="flex justify-center mt-4">
+                  {Array.from({ length: Math.ceil(filteredData.length / cardsPerPage) }, (_, i) => (
+                    <button
+                      key={i}
+                      onClick={() => paginate(i + 1)}
+                      className={`px-3 py-1 mx-1 ${currentPage === i + 1 ? 'bg-blue-700 text-white' : 'bg-gray-300 dark:bg-gray-700'}`}
+                    >
+                      {i + 1}
+                    </button>
+                  ))}
+                </div>
+              </main>
 
-      <footer className="bg-gray-200 dark:bg-gray-800 flex justify-center gap-4 py-4 text-center">
-        <p>&copy; Xplace 2024</p>
-        <button onClick={() => setShowDisclaimer(true)} className="text-blue-500 hover:text-blue-700">
-          Disclaimer
-        </button>
-      </footer>
+              <footer className="bg-gray-200 dark:bg-gray-800 flex justify-center gap-4 py-4 text-center">
+                <p>&copy; Xplace 2024</p>
+                <button onClick={() => setShowDisclaimer(true)} className="text-blue-500 hover:text-blue-700">
+                  Disclaimer
+                </button>
+              </footer>
 
-      {showDisclaimer && <DisclaimerPopup onDismiss={() => setShowDisclaimer(false)} />}
-
-      <Toaster position="bottom-right" />
-    </div>
+              {showDisclaimer && <DisclaimerPopup onDismiss={() => setShowDisclaimer(false)} />}
+            </div>
+          } />
+        </Routes>
+        <Toaster position="bottom-right" />
+      </div>
+    </Router>
   );
 }
 

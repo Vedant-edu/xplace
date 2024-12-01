@@ -6,7 +6,7 @@ interface DisclaimerPopupProps {
 
 export const DisclaimerPopup: React.FC<DisclaimerPopupProps> = ({ onDismiss }) => {
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 h-[100vh]">
       <div className="bg-white dark:bg-gray-800 rounded-lg shadow-lg p-6 max-w-lg w-full">
         <h2 className="text-xl font-semibold mb-4">Disclaimer</h2>
         <p className="mb-4">
