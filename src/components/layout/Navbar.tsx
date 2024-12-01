@@ -28,7 +28,7 @@ export const Navbar: React.FC<NavbarProps> = ({
               to="/admin"
               className="text-blue-500 hover:underline dark:text-blue-400"
             >
-              A
+              .
             </Link>
           )}
           <ThemeToggle isDark={isDark} toggleTheme={onThemeToggle} />

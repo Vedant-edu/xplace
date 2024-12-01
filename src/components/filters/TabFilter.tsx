@@ -7,7 +7,7 @@ interface TabFilterProps {
 
 export const TabFilter: React.FC<TabFilterProps> = ({ activeTab, onTabChange }) => {
   return (
-    <div className="flex items-center space-x-2 bg-white dark:bg-gray-800 rounded-3xl ">
+    <div className="flex items-center space-x-2 bg-white dark:bg-gray-800 rounded-3xl">
       {(['entc', 'scoe', 'all'] as const).map((tab) => (
         <button
           key={tab}
