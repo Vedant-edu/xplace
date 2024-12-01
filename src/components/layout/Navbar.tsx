@@ -1,5 +1,6 @@
 import React from 'react';
 import { ThemeToggle } from '../ThemeToggle';
+import { Link } from 'react-router-dom';
 
 interface NavbarProps {
   isDark: boolean;
@@ -26,12 +27,12 @@ export const Navbar: React.FC<NavbarProps> = ({
         </div>
         <div className="flex items-center space-x-4">
           {!isAdmin && (
-            <a
-              href="/admin"
+            <Link
+              to="/admin"
               className="text-blue-500 hover:underline dark:text-blue-400"
             >
               A
-            </a>
+            </Link>
           )}
           <ThemeToggle isDark={isDark} toggleTheme={onThemeToggle} />
         </div>
